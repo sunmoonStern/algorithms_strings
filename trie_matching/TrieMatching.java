@@ -43,7 +43,8 @@ public class TrieMatching implements Runnable {
 		trie.add(new HashMap<Character, Integer>()); // check for leaf
 		for (int i = 0; i < n; i++) {
 			int node = 0;
-			for (int j = 0; j < patterns.get(i).length(); j++) {
+			int len = patterns.get(i).length();
+			for (int j = 0; j < len; j++) {
 				Map<Character, Integer> labelIndexMap = trie.get(node);
 				char ch = patterns.get(i).charAt(j);
 				int dest = -1;
