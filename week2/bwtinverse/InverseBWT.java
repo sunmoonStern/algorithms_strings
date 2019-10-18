@@ -32,9 +32,13 @@ public class InverseBWT {
         for (int i = 0; i < n; i++) {
             texts[i] = String.valueOf(chars[i]);
         }
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n - 1; i++) {
             for (int j = 0; j < n; j++) {
-                texts[j] = String.valueOf(bwt.charAt(j)) + texts[j];
+                sb.setLength(0);
+                sb.append(String.valueOf(bwt.charAt(j)));
+                sb.append(texts[j]);
+                texts[j] = sb.toString();
             }
             texts = sortElems(texts);
         }
