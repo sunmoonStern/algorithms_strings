@@ -25,9 +25,25 @@ public class BurrowsWheelerTransform {
 
     String BWT(String text) {
         StringBuilder result = new StringBuilder();
-
-        // write your code here
-
+        int n = text.length();
+        String[] texts = new String[n];
+        for (int i = 0; i < n; i++) {
+            String firstHalf = text.substring(0, i);
+            String secondHalf = text.substring(i, n);
+            texts[i] = secondHalf + firstHalf;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (texts[i].compareTo(texts[j]) > 0) {
+                    String tmp = texts[j];
+                    texts[j] = texts[i];
+                    texts[i] = tmp;
+                }
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            result.append(texts[i].charAt(n - 1));
+        }
         return result.toString();
     }
 
