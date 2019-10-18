@@ -45,10 +45,11 @@ public class InverseBWT {
             getAllIndex(firstColumn, 'G'), getAllIndex(firstColumn, 'T'));
         int index = 0;
         for (int i = 0; i < n; i++) {
+            // insert only once, and mostly use append for performance issues (reverse later)
             if (i == n - 1) {
-                result.append(bwt.charAt(index));
-            } else {
                 result.insert(0, bwt.charAt(index));
+            } else {
+                result.append(bwt.charAt(index));
             }
             String tmp = indexToOccurence[index];
             // string, int
@@ -71,55 +72,63 @@ public class InverseBWT {
                     break;
             }
         }
-        return result.toString();
+        return result.reverse().toString();
     }
 
-    List<Integer> getAllIndex(String str, char target) {
-        List<Integer> res = new ArrayList<Integer>();
+    boolean[] getAllIndex(String str, char target) {
+        boolean[] res = new boolean[1000000];
         int index = str.indexOf(target);
         while (index >= 0) {
-            res.add(index);
+            res[index] = true;
             index = str.indexOf(target, index + 1);
         }
         return res;
     }
 
-    void createMap(String str, List<Integer> aOccurence, List<Integer> cOccurence,
-                   List<Integer> gOccurence, List<Integer> tOccurence) {
+    void createMap(String str, boolean[] aOccurence, boolean[] cOccurence,
+                   boolean[] gOccurence, boolean[] tOccurence) {
+        int aCounter = 0;
+        int cCounter = 0;
+        int gCounter = 0;
+        int tCounter = 0;
         for (int i = 0; i < str.length(); i++) {
-            if (aOccurence.contains(i)) {
-                int occurence = aOccurence.indexOf(i);
-                indexToOccurence[i] = String.valueOf('A') + DELIMITER + occurence;
-            } else if (cOccurence.contains(i)) {
-                int occurence = cOccurence.indexOf(i);
-                indexToOccurence[i] = String.valueOf('C') + DELIMITER + occurence;
-            } else if (gOccurence.contains(i)) {
-                int occurence = gOccurence.indexOf(i);
-                indexToOccurence[i] = String.valueOf('G') + DELIMITER + occurence;
-            } else if (tOccurence.contains(i)) {
-                int occurence = tOccurence.indexOf(i);
-                indexToOccurence[i] = String.valueOf('T') + DELIMITER + occurence;
+            if (aOccurence[i]) {
+                indexToOccurence[i] = String.valueOf('A') + DELIMITER + aCounter;
+                aCounter += 1;
+            } else if (cOccurence[i]) {
+                indexToOccurence[i] = String.valueOf('C') + DELIMITER + cCounter;
+                cCounter += 1;
+            } else if (gOccurence[i]) {
+                indexToOccurence[i] = String.valueOf('G') + DELIMITER + gCounter;
+                gCounter += 1;
+            } else if (tOccurence[i]) {
+                indexToOccurence[i] = String.valueOf('T') + DELIMITER + tCounter;
+                tCounter += 1;
             } else {
                 indexToOccurence[i] = String.valueOf('$') + DELIMITER + 0;
             }
         }
     }
 
-    void createInvMap(String str, List<Integer> aOccurence, List<Integer> cOccurence,
-                      List<Integer> gOccurence, List<Integer> tOccurence) {
+    void createInvMap(String str, boolean[] aOccurence, boolean[] cOccurence,
+                      boolean[] gOccurence, boolean[] tOccurence) {
+        int aCounter = 0;
+        int cCounter = 0;
+        int gCounter = 0;
+        int tCounter = 0;
         for (int i = 0; i < str.length(); i++) {
-            if (aOccurence.contains(i)) {
-                int occurence = aOccurence.indexOf(i);
-                aOccurToIndex[occurence] = i;
-            } else if (cOccurence.contains(i)) {
-                int occurence = cOccurence.indexOf(i);
-                cOccurToIndex[occurence] = i;
-            } else if (gOccurence.contains(i)) {
-                int occurence = gOccurence.indexOf(i);
-                gOccurToIndex[occurence] = i;
-            } else if (tOccurence.contains(i)) {
-                int occurence = tOccurence.indexOf(i);
-                tOccurToIndex[occurence] = i;
+            if (aOccurence[i]) {
+                aOccurToIndex[aCounter] = i;
+                aCounter += 1;
+            } else if (cOccurence[i]) {
+                cOccurToIndex[cCounter] = i;
+                cCounter += 1;
+            } else if (gOccurence[i]) {
+                gOccurToIndex[gCounter] = i;
+                gCounter += 1;
+            } else if (tOccurence[i]) {
+                tOccurToIndex[tCounter] = i;
+                tCounter += 1;
             }
             // no need to process "$"
         }
