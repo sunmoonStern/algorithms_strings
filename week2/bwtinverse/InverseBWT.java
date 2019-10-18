@@ -5,8 +5,12 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 
 public class InverseBWT {
-    Map<Integer, SimpleEntry<Character, Integer>> indexToOccurence = new HashMap<>();
-    Map<SimpleEntry<Character, Integer>, Integer> occurenceToIndex = new HashMap<>();
+    String[] indexToOccurence = new String[1000000];
+    int[] aOccurToIndex = new int[1000000];
+    int[] cOccurToIndex = new int[1000000];
+    int[] gOccurToIndex = new int[1000000];
+    int[] tOccurToIndex = new int[1000000];
+    String DELIMITER = "\t";
 
     class FastScanner {
         StringTokenizer tok = new StringTokenizer("");
@@ -25,11 +29,6 @@ public class InverseBWT {
         int nextInt() throws IOException {
             return Integer.parseInt(next());
         }
-    }
-
-    int convertLastToFirst(int i, String firstColumn, String lastColumn) {
-        char letter = lastColumn.charAt(i);
-        return 0;
     }
 
     String inverseBWT(String bwt) {
@@ -51,8 +50,26 @@ public class InverseBWT {
             } else {
                 result.insert(0, bwt.charAt(index));
             }
-            SimpleEntry<Character, Integer> tmp = indexToOccurence.get(index);
-            index = occurenceToIndex.get(tmp);
+            String tmp = indexToOccurence[index];
+            // string, int
+            String letter = tmp.split(DELIMITER)[0];
+            int occurence = Integer.parseInt(tmp.split(DELIMITER)[1]);
+            switch (letter) {
+                case "A":
+                    index = aOccurToIndex[occurence];
+                    break;
+                case "C":
+                    index = cOccurToIndex[occurence];
+                    break;
+                case "G":
+                    index = gOccurToIndex[occurence];
+                    break;
+                case "T":
+                    index = tOccurToIndex[occurence];
+                    break;
+                case "$":
+                    break;
+            }
         }
         return result.toString();
     }
@@ -71,20 +88,19 @@ public class InverseBWT {
                    List<Integer> gOccurence, List<Integer> tOccurence) {
         for (int i = 0; i < str.length(); i++) {
             if (aOccurence.contains(i)) {
-                int occurence = aOccurence.indexOf(i) + 1;
-                indexToOccurence.put(i, new SimpleEntry<Character, Integer>('A', occurence));
+                int occurence = aOccurence.indexOf(i);
+                indexToOccurence[i] = String.valueOf('A') + DELIMITER + occurence;
             } else if (cOccurence.contains(i)) {
-                int occurence = cOccurence.indexOf(i) + 1;
-                indexToOccurence.put(i, new SimpleEntry<Character, Integer>('C', occurence));
+                int occurence = cOccurence.indexOf(i);
+                indexToOccurence[i] = String.valueOf('C') + DELIMITER + occurence;
             } else if (gOccurence.contains(i)) {
-                int occurence = gOccurence.indexOf(i) + 1;
-                indexToOccurence.put(i, new SimpleEntry<Character, Integer>('G', occurence));
+                int occurence = gOccurence.indexOf(i);
+                indexToOccurence[i] = String.valueOf('G') + DELIMITER + occurence;
             } else if (tOccurence.contains(i)) {
-                int occurence = tOccurence.indexOf(i) + 1;
-                indexToOccurence.put(i, new SimpleEntry<Character, Integer>('T', occurence));
+                int occurence = tOccurence.indexOf(i);
+                indexToOccurence[i] = String.valueOf('T') + DELIMITER + occurence;
             } else {
-                // this is $. i -> ('$', 0)
-                indexToOccurence.put(i, new SimpleEntry<Character, Integer>('$', 1));
+                indexToOccurence[i] = String.valueOf('$') + DELIMITER + 0;
             }
         }
     }
@@ -93,20 +109,19 @@ public class InverseBWT {
                       List<Integer> gOccurence, List<Integer> tOccurence) {
         for (int i = 0; i < str.length(); i++) {
             if (aOccurence.contains(i)) {
-                int occurence = aOccurence.indexOf(i) + 1;
-                occurenceToIndex.put(new SimpleEntry<Character, Integer>('A', occurence), i);
+                int occurence = aOccurence.indexOf(i);
+                aOccurToIndex[occurence] = i;
             } else if (cOccurence.contains(i)) {
-                int occurence = cOccurence.indexOf(i) + 1;
-                occurenceToIndex.put(new SimpleEntry<Character, Integer>('C', occurence), i);
+                int occurence = cOccurence.indexOf(i);
+                cOccurToIndex[occurence] = i;
             } else if (gOccurence.contains(i)) {
-                int occurence = gOccurence.indexOf(i) + 1;
-                occurenceToIndex.put(new SimpleEntry<Character, Integer>('G', occurence), i);
+                int occurence = gOccurence.indexOf(i);
+                gOccurToIndex[occurence] = i;
             } else if (tOccurence.contains(i)) {
-                int occurence = tOccurence.indexOf(i) + 1;
-                occurenceToIndex.put(new SimpleEntry<Character, Integer>('T', occurence), i);
-            } else {
-                occurenceToIndex.put(new SimpleEntry<Character, Integer>('$', 1), i);
+                int occurence = tOccurence.indexOf(i);
+                tOccurToIndex[occurence] = i;
             }
+            // no need to process "$"
         }
     }
 
