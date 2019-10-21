@@ -38,11 +38,8 @@ public class InverseBWT {
         String firstColumn = new String(chars);
         int n = chars.length;
         // find all occurences of A, C, G, T, $
-        createMap(bwt, getAllIndex(bwt, 'A'), getAllIndex(bwt, 'C'),
-            getAllIndex(bwt, 'G'), getAllIndex(bwt, 'T'));
-        createInvMap(firstColumn, getAllIndex(firstColumn, 'A'),
-            getAllIndex(firstColumn, 'C'),
-            getAllIndex(firstColumn, 'G'), getAllIndex(firstColumn, 'T'));
+        createMap(bwt);
+        createInvMap(firstColumn);
         int index = 0;
         for (int i = 0; i < n; i++) {
             // insert only once, and mostly use append for performance issues (reverse later)
@@ -75,60 +72,59 @@ public class InverseBWT {
         return result.reverse().toString();
     }
 
-    boolean[] getAllIndex(String str, char target) {
-        boolean[] res = new boolean[1000000];
-        int index = str.indexOf(target);
-        while (index >= 0) {
-            res[index] = true;
-            index = str.indexOf(target, index + 1);
-        }
-        return res;
-    }
-
-    void createMap(String str, boolean[] aOccurence, boolean[] cOccurence,
-                   boolean[] gOccurence, boolean[] tOccurence) {
+    void createMap(String str) {
         int aCounter = 0;
         int cCounter = 0;
         int gCounter = 0;
         int tCounter = 0;
         for (int i = 0; i < str.length(); i++) {
-            if (aOccurence[i]) {
-                indexToOccurence[i] = String.valueOf('A') + DELIMITER + aCounter;
-                aCounter += 1;
-            } else if (cOccurence[i]) {
-                indexToOccurence[i] = String.valueOf('C') + DELIMITER + cCounter;
-                cCounter += 1;
-            } else if (gOccurence[i]) {
-                indexToOccurence[i] = String.valueOf('G') + DELIMITER + gCounter;
-                gCounter += 1;
-            } else if (tOccurence[i]) {
-                indexToOccurence[i] = String.valueOf('T') + DELIMITER + tCounter;
-                tCounter += 1;
-            } else {
-                indexToOccurence[i] = String.valueOf('$') + DELIMITER + 0;
+            switch (str.charAt(i)) {
+                case 'A':
+                    indexToOccurence[i] = String.valueOf('A') + DELIMITER + aCounter;
+                    aCounter += 1;
+                    break;
+                case 'C':
+                    indexToOccurence[i] = String.valueOf('C') + DELIMITER + cCounter;
+                    cCounter += 1;
+                    break;
+                case 'G':
+                    indexToOccurence[i] = String.valueOf('G') + DELIMITER + gCounter;
+                    gCounter += 1;
+                    break;
+                case 'T':
+                    indexToOccurence[i] = String.valueOf('T') + DELIMITER + tCounter;
+                    tCounter += 1;
+                    break;
+                case '$':
+                    indexToOccurence[i] = String.valueOf('$') + DELIMITER + 0;
+                    break;
             }
         }
     }
 
-    void createInvMap(String str, boolean[] aOccurence, boolean[] cOccurence,
-                      boolean[] gOccurence, boolean[] tOccurence) {
+    void createInvMap(String str) {
         int aCounter = 0;
         int cCounter = 0;
         int gCounter = 0;
         int tCounter = 0;
         for (int i = 0; i < str.length(); i++) {
-            if (aOccurence[i]) {
-                aOccurToIndex[aCounter] = i;
-                aCounter += 1;
-            } else if (cOccurence[i]) {
-                cOccurToIndex[cCounter] = i;
-                cCounter += 1;
-            } else if (gOccurence[i]) {
-                gOccurToIndex[gCounter] = i;
-                gCounter += 1;
-            } else if (tOccurence[i]) {
-                tOccurToIndex[tCounter] = i;
-                tCounter += 1;
+            switch (str.charAt(i)) {
+                case 'A':
+                    aOccurToIndex[aCounter] = i;
+                    aCounter += 1;
+                    break;
+                case 'C':
+                    cOccurToIndex[cCounter] = i;
+                    cCounter += 1;
+                    break;
+                case 'G':
+                    gOccurToIndex[gCounter] = i;
+                    gCounter += 1;
+                    break;
+                case 'T':
+                    tOccurToIndex[tCounter] = i;
+                    tCounter += 1;
+                    break;
             }
             // no need to process "$"
         }
