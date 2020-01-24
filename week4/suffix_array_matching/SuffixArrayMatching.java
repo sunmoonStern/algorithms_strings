@@ -66,7 +66,6 @@ public class SuffixArrayMatching {
             midIndex = (minIndex + maxIndex)/2;
             // suffix
             String suffix = text.substring(suffixArray[midIndex]);
-            suffix = suffix.substring(0, suffix.length() - 1);
 
             // if pattern > suffix
             if (pattern.compareTo(suffix) > 0) {
@@ -76,38 +75,24 @@ public class SuffixArrayMatching {
             }
         }
         int start = minIndex;
-        if (start == text.length() - 1) { // index == text.length() - 1 corresponds to $ at the end
+        if (start >= text.length() || !text.substring(suffixArray[start]).startsWith(pattern)) {
             return result;
         }
 
         // at this point, we found at least one match
         // find ending index (maxIndex)
-        maxIndex = text.length();
-        while (minIndex < maxIndex) {
-            midIndex = (minIndex + maxIndex)/2;
-            String suffix = text.substring(suffixArray[midIndex]);
-            suffix = suffix.substring(0, suffix.length() - 1);
+        for (int i = minIndex; i < text.length(); i++) {
+            String suffix = text.substring(suffixArray[i]);
 
-            if (pattern.compareTo(suffix) < 0) {
-                if (suffix.startsWith(pattern)) {
-                    minIndex = midIndex; // loop does not stop
-                } else {
-                    maxIndex = midIndex - 1;
-                }
+            if (suffix.startsWith(pattern)) {
+                maxIndex = i;
             } else {
-                minIndex = midIndex;
-            }
-            if (minIndex == text.length() - 1) {
-                maxIndex = minIndex;
-                break;
-            }
-            if (minIndex == maxIndex - 1) {
                 break;
             }
         }
         int end = maxIndex;
         if (start <= end) {
-            for (int i = start; i <= end; i++) {
+            for (int i = start; i <=  end; i++) {
                 result.add(suffixArray[i]);
             }
         }
@@ -131,6 +116,10 @@ public class SuffixArrayMatching {
         fastscanner scanner = new fastscanner();
         String text = scanner.next() + "$";
         int[] suffixArray = computeSuffixArray(text);
+        // for debug, print suffix arrays
+//        for (int i = 0; i < suffixArray.length; i++) {
+//            System.out.println(text.substring(suffixArray[i]));
+//        }
         int patternCount = scanner.nextint();
         boolean[] occurs = new boolean[text.length()];
         for (int patternIndex = 0; patternIndex < patternCount; ++patternIndex) {
