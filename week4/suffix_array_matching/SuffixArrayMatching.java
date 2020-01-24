@@ -64,11 +64,10 @@ public class SuffixArrayMatching {
         // find starting index (minIndex)
         while (minIndex < maxIndex) {
             midIndex = (minIndex + maxIndex)/2;
-            // suffix
-            String suffix = text.substring(suffixArray[midIndex]);
+            int sgn = compareSuffixAndPattern(text, suffixArray[midIndex], pattern);
 
             // if pattern > suffix
-            if (pattern.compareTo(suffix) > 0) {
+            if (sgn < 0) {
                 minIndex = midIndex + 1;
             } else {
                 maxIndex = midIndex;
@@ -84,27 +83,54 @@ public class SuffixArrayMatching {
         maxIndex = text.length();
         while (minIndex < maxIndex && maxIndex > minIndex + 1) {
             midIndex = (minIndex + maxIndex)/2;
-            String suffix = text.substring(suffixArray[midIndex]);
-
-            int sgn = pattern.compareTo(suffix);
-
-            if (sgn < 0 && !text.substring(suffixArray[midIndex]).startsWith(pattern)) {
+            int sgn = compareSuffixAndPattern(text, suffixArray[midIndex], pattern);
+            if (startsWith(text, suffixArray[midIndex], pattern)) {
+                minIndex = midIndex;
+            } else if (sgn > 0 && !startsWith(text, suffixArray[midIndex], pattern)) {
                 maxIndex = midIndex;
-            } else if (sgn == 0) {
-                minIndex = midIndex;
-            } else if (sgn > 0) {
-                minIndex = midIndex;
-            } else if (text.substring(suffixArray[midIndex]).startsWith(pattern)) {
+            } else {
                 minIndex = midIndex;
             }
         }
         int end = maxIndex;
         if (start < end) {
-            for (int i = start; i <  end; i++) {
+            for (int i = start; i < end; i++) {
                 result.add(suffixArray[i]);
             }
         }
         return result;
+    }
+
+    // if suffix > pattern return positive
+    private int compareSuffixAndPattern(String text, int index,  String pattern) {
+        int L = Math.min(text.length() - index, pattern.length());
+        for (int i = 0; i < L; i++) {
+            char c = text.charAt(index + i);
+            char p = pattern.charAt(i);
+            if (c == p) {
+                continue;
+            } else {
+                return c - p;
+            }
+        }
+        return (text.length() - index) - pattern.length();
+    }
+
+    // substringを使って比較すると時間がかかりすぎる
+    private boolean startsWith(String text, int index, String pattern) {
+        for (int i = 0; i < pattern.length(); i++) {
+            if (index + i >= text.length()) {
+                return false;
+            }
+            char c = text.charAt(index + i);
+            char p = pattern.charAt(i);
+            if (c == p) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     static public void main(String[] args) throws IOException {
@@ -126,7 +152,7 @@ public class SuffixArrayMatching {
         int[] suffixArray = computeSuffixArray(text);
         // for debug, print suffix arrays
 //        for (int i = 0; i < suffixArray.length; i++) {
-//            System.out.println(i + " : " + text.substring(suffixArray[i]));
+//            System.out.println(i + " : " + text.substring(suffixArray[i]) + " : " + suffixArray[i]);
 //        }
         int patternCount = scanner.nextint();
         boolean[] occurs = new boolean[text.length()];
