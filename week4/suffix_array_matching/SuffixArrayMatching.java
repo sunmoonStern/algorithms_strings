@@ -81,18 +81,26 @@ public class SuffixArrayMatching {
 
         // at this point, we found at least one match
         // find ending index (maxIndex)
-        for (int i = minIndex; i < text.length(); i++) {
-            String suffix = text.substring(suffixArray[i]);
+        maxIndex = text.length();
+        while (minIndex < maxIndex && maxIndex > minIndex + 1) {
+            midIndex = (minIndex + maxIndex)/2;
+            String suffix = text.substring(suffixArray[midIndex]);
 
-            if (suffix.startsWith(pattern)) {
-                maxIndex = i;
-            } else {
-                break;
+            int sgn = pattern.compareTo(suffix);
+
+            if (sgn < 0 && !text.substring(suffixArray[midIndex]).startsWith(pattern)) {
+                maxIndex = midIndex;
+            } else if (sgn == 0) {
+                minIndex = midIndex;
+            } else if (sgn > 0) {
+                minIndex = midIndex;
+            } else if (text.substring(suffixArray[midIndex]).startsWith(pattern)) {
+                minIndex = midIndex;
             }
         }
         int end = maxIndex;
-        if (start <= end) {
-            for (int i = start; i <=  end; i++) {
+        if (start < end) {
+            for (int i = start; i <  end; i++) {
                 result.add(suffixArray[i]);
             }
         }
@@ -118,7 +126,7 @@ public class SuffixArrayMatching {
         int[] suffixArray = computeSuffixArray(text);
         // for debug, print suffix arrays
 //        for (int i = 0; i < suffixArray.length; i++) {
-//            System.out.println(text.substring(suffixArray[i]));
+//            System.out.println(i + " : " + text.substring(suffixArray[i]));
 //        }
         int patternCount = scanner.nextint();
         boolean[] occurs = new boolean[text.length()];
