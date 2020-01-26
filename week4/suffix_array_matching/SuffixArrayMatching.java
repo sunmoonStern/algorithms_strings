@@ -64,54 +64,73 @@ public class SuffixArrayMatching {
         // find starting index (minIndex)
         while (minIndex < maxIndex) {
             midIndex = (minIndex + maxIndex)/2;
-            // suffix
-            String suffix = text.substring(suffixArray[midIndex]);
-            suffix = suffix.substring(0, suffix.length() - 1);
+            int sgn = compareSuffixAndPattern(text, suffixArray[midIndex], pattern);
 
             // if pattern > suffix
-            if (pattern.compareTo(suffix) > 0) {
+            if (sgn < 0) {
                 minIndex = midIndex + 1;
             } else {
                 maxIndex = midIndex;
             }
         }
         int start = minIndex;
-        if (start == text.length() - 1) { // index == text.length() - 1 corresponds to $ at the end
+        if (start >= text.length() || !text.substring(suffixArray[start]).startsWith(pattern)) {
             return result;
         }
 
         // at this point, we found at least one match
         // find ending index (maxIndex)
         maxIndex = text.length();
-        while (minIndex < maxIndex) {
+        while (minIndex < maxIndex && maxIndex > minIndex + 1) {
             midIndex = (minIndex + maxIndex)/2;
-            String suffix = text.substring(suffixArray[midIndex]);
-            suffix = suffix.substring(0, suffix.length() - 1);
-
-            if (pattern.compareTo(suffix) < 0) {
-                if (suffix.startsWith(pattern)) {
-                    minIndex = midIndex; // loop does not stop
-                } else {
-                    maxIndex = midIndex - 1;
-                }
+            int sgn = compareSuffixAndPattern(text, suffixArray[midIndex], pattern);
+            if (startsWith(text, suffixArray[midIndex], pattern)) {
+                minIndex = midIndex;
+            } else if (sgn > 0 && !startsWith(text, suffixArray[midIndex], pattern)) {
+                maxIndex = midIndex;
             } else {
                 minIndex = midIndex;
             }
-            if (minIndex == text.length() - 1) {
-                maxIndex = minIndex;
-                break;
-            }
-            if (minIndex == maxIndex - 1) {
-                break;
-            }
         }
         int end = maxIndex;
-        if (start <= end) {
-            for (int i = start; i <= end; i++) {
+        if (start < end) {
+            for (int i = start; i < end; i++) {
                 result.add(suffixArray[i]);
             }
         }
         return result;
+    }
+
+    // if suffix > pattern return positive
+    private int compareSuffixAndPattern(String text, int index,  String pattern) {
+        int L = Math.min(text.length() - index, pattern.length());
+        for (int i = 0; i < L; i++) {
+            char c = text.charAt(index + i);
+            char p = pattern.charAt(i);
+            if (c == p) {
+                continue;
+            } else {
+                return c - p;
+            }
+        }
+        return (text.length() - index) - pattern.length();
+    }
+
+    // substringを使って比較すると時間がかかりすぎる
+    private boolean startsWith(String text, int index, String pattern) {
+        for (int i = 0; i < pattern.length(); i++) {
+            if (index + i >= text.length()) {
+                return false;
+            }
+            char c = text.charAt(index + i);
+            char p = pattern.charAt(i);
+            if (c == p) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     static public void main(String[] args) throws IOException {
@@ -131,6 +150,10 @@ public class SuffixArrayMatching {
         fastscanner scanner = new fastscanner();
         String text = scanner.next() + "$";
         int[] suffixArray = computeSuffixArray(text);
+        // for debug, print suffix arrays
+//        for (int i = 0; i < suffixArray.length; i++) {
+//            System.out.println(i + " : " + text.substring(suffixArray[i]) + " : " + suffixArray[i]);
+//        }
         int patternCount = scanner.nextint();
         boolean[] occurs = new boolean[text.length()];
         for (int patternIndex = 0; patternIndex < patternCount; ++patternIndex) {

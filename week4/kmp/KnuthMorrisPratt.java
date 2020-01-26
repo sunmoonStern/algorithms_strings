@@ -28,32 +28,8 @@ public class KnuthMorrisPratt {
     // the pattern starts in the text.
     public List<Integer> findPattern(String pattern, String text) {
         ArrayList<Integer> result = new ArrayList<Integer>();
-        String str = pattern + "$" + text;
-        int[] prefixFunc = computePrefixFunction(str);
-        for (int i = pattern.length() + 1; i < str.length(); i++) {
-            if (prefixFunc[i] == pattern.length()) {
-                result.add(i - 2 * pattern.length());
-            }
-        }
+        // Implement this function yourself
         return result;
-    }
-
-    public int[] computePrefixFunction(String str) {
-        int[] s = new int[str.length()];
-        s[0] = 0;
-        int border = 0;
-        for (int i = 1; i < str.length(); i++) {
-            while (border > 0 && str.charAt(i) != str.charAt(border)) {
-                border = s[border - 1];
-            }
-            if (str.charAt(i) == str.charAt(border)) {
-                border = border + 1;
-            } else {
-                border = 0;
-            }
-            s[i] = border;
-        }
-        return s;
     }
 
     static public void main(String[] args) throws IOException {
